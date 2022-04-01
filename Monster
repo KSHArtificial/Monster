@@ -1,0 +1,68 @@
+module Monster exposing (..)
+
+import Html exposing (..)
+import Playground exposing (..)
+import Html.Attributes exposing (..)
+import String exposing (..)
+import Json.Decode exposing (string)
+import Random exposing (Seed)
+import Debug exposing (log)
+
+
+
+main =
+  game view update
+    { x = 0
+    , y = 0
+    , angle = 0
+    , monster = [{x = 10, y = 10}, {x = 10, y = 20}, {x = 10, y = 30}]
+    }
+
+
+s : List Int
+s = [1, 2, 3, 4]
+
+f1 : Bool
+f1 = "a" == String.fromInt 1
+
+s1 : List String
+s1 = List.map String.fromInt s
+
+f2 : (Int -> Bool)
+f2 =  (\x -> x == 1)
+
+s2 : List Bool
+s2 = List.map f2 s 
+
+s3 : Seed
+s3 = Random.initialSeed 0
+
+s4 =
+    let
+        (l, seed) = List.foldl f3 ( [], s3 ) (List.range 0 10)
+
+    in
+        l
+
+f3 z (l, seed0) = 
+    let
+        (x, seed1) = Random.step (Random.int 0 100) seed0
+        (y, seed2) = Random.step (Random.int 0 100) seed1
+        mob = {x = x, y = y}
+
+    in
+        (mob :: l , seed2)
+
+view computer monster =
+  [ rectangle blue computer.screen.width computer.screen.height
+  , image 96 96 "/Images/monster.png"
+      |> move monster.x monster.y
+      |> rotate monster.angle
+  ]
+
+
+update computer monster =
+   { monster | x = monster.x + toY computer.keyboard * cos (degrees monster.angle)
+    , y = monster.y + toY computer.keyboard * sin (degrees monster.angle)
+    , angle = monster.angle - toX computer.keyboard
+   }
